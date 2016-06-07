@@ -26,6 +26,14 @@ public class MoveObject : MonoBehaviour
     public GameObject picture;
     private GameObject copied_picture;
 
+    public Rigidbody2D rbody;
+
+    public void Freeze()
+    {
+        rbody = GetComponent<Rigidbody2D>();
+        rbody.constraints = RigidbodyConstraints2D.FreezeAll;
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -41,11 +49,10 @@ public class MoveObject : MonoBehaviour
                     rows / expansion_rate - (float)j / expansion_rate);
                 objects[i, j] = Instantiate(origin) as GameObject;
                 objects[i, j].transform.position = new Vector3(vecmap[i, j].pos.x, vecmap[i, j].pos.y, transform.position.z + 1);
-                objects[i, j].name = i + " " + j;
+                objects[i, j].name = i + " " + j + " " + player_num;
             }
         }
         copied_picture = Instantiate(picture) as GameObject;
-        Debug.Log(copied_picture.transform.localScale);
         copied_picture.transform.position = new Vector3(vecmap[0, 0].pos.x, vecmap[0, 0].pos.y, transform.position.z + 1);
         Vector3 tmpvec = copied_picture.GetComponent<SpriteRenderer>().bounds.size;
         copied_picture.transform.localScale = new Vector3(
