@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using GamepadInput;
+using System;
 
 public class MoveObject : MonoBehaviour
 {
@@ -26,12 +27,18 @@ public class MoveObject : MonoBehaviour
     public GameObject picture;
     private GameObject copied_picture;
 
-    public Rigidbody2D rbody;
+    private bool is_finished = false;
+    private bool is_finished2 = false;
 
     public void Freeze()
     {
-        rbody = GetComponent<Rigidbody2D>();
-        rbody.constraints = RigidbodyConstraints2D.FreezeAll;
+        is_finished = true;
+    }
+
+    public void forcedlyFreeze()
+    {
+        is_finished = true;
+        is_finished2 = true;
     }
 
     // Use this for initialization
@@ -63,110 +70,173 @@ public class MoveObject : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        string[] strarg = other.name.Split(' ');
-        if (vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped == false)
+        try
         {
-            points++;
-            vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped = true;
+            if (other.name == "initial " + player_num)
+            {
+                if (is_finished)
+                {
+                    is_finished2 = true;
+                }
+            }
+            else
+            {
+                string[] strarg = other.name.Split(' ');
+                if (vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped == false)
+                {
+                    points++;
+                    vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped = true;
+                }
+            }
+        }
+        catch (FormatException)
+        {
+            // just in case
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (player_num == 0)
+        if (!is_finished2)
         {
-            if (Input.GetKey(KeyCode.UpArrow))
+            switch (player_num)
             {
-                transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
-            }
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                case 1:
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).y > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).y < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).x > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).x < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                    }
+                    break;
+                case 2:
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).y > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).y < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).x > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).x < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                    }
+                    break;
+                case 3:
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).y > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).y < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).x > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).x < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                    }
+                    break;
+                case 4:
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).y > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).y < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).x > 0)
+                    {
+                        transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
+                    }
+                    if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).x < 0)
+                    {
+                        transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                    }
+                    break;
+                default:
+                    if (Input.GetKey(KeyCode.UpArrow))
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
+                    }
+                    if (Input.GetKey(KeyCode.DownArrow))
+                    {
+                        transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
+                    }
+                    if (Input.GetKey(KeyCode.RightArrow))
+                    {
+                        transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
+                    }
+                    if (Input.GetKey(KeyCode.LeftArrow))
+                    {
+                        transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                    }
+                    break;
             }
         }
-        else if (player_num == 1)
+    }
+    
+    void OnGUI()
+    {
+        if (is_finished2)
         {
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).y > 0)
+            switch(player_num)
             {
-                transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).y < 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).x > 0)
-            {
-                transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.One).x < 0)
-            {
-                transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
-            }
-        }
-        else if (player_num == 2)
-        {
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).y > 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).y < 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).x > 0)
-            {
-                transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Two).x < 0)
-            {
-                transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
-            }
-        }
-        else if (player_num == 3)
-        {
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).y > 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).y < 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).x > 0)
-            {
-                transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Three).x < 0)
-            {
-                transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
-            }
-        }
-        else if (player_num == 4)
-        {
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).y > 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y + 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).y < 0)
-            {
-                transform.position = new Vector3(transform.position.x, transform.position.y - 0.1f, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).x > 0)
-            {
-                transform.position = new Vector3(transform.position.x + 0.1f, transform.position.y, transform.position.z);
-            }
-            if (GamePad.GetAxis(GamePad.Axis.LeftStick, GamePad.Index.Four).x < 0)
-            {
-                transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y, transform.position.z);
+                case 1:
+                    GUI.Label(new Rect(Screen.width / 4,
+                        Screen.height / 4,
+                        Screen.width / 4,
+                        Screen.height / 4),
+                        "Finish!!");
+                    break;
+                case 2:
+                    GUI.Label(new Rect(3*Screen.width / 4,
+                        Screen.height / 4,
+                        Screen.width / 4,
+                        Screen.height / 4),
+                        "Finish!!");
+                    break;
+                case 3:
+                    GUI.Label(new Rect(Screen.width / 4,
+                        3 * Screen.height / 4,
+                        Screen.width / 4,
+                        Screen.height / 4),
+                        "Finish!!");
+                    break;
+                case 4:
+                    GUI.Label(new Rect(3 * Screen.width / 4,
+                        3 * Screen.height / 4,
+                        Screen.width / 4,
+                        Screen.height / 4),
+                        "Finish!!");
+                    break;
+                default:
+                    GUI.Label(new Rect(Screen.width / 4,
+                        Screen.height / 4,
+                        Screen.width / 4,
+                        Screen.height / 4),
+                        "Finish!!");
+                    break;
             }
         }
     }

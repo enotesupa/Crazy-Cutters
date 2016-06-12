@@ -17,14 +17,23 @@ public class GameRuler : MonoBehaviour {
     public GameObject p3_obj;
     public GameObject p4_obj;
 
-    // Use this for initialization
-    void Start () {
+    public float timer = 60f;
 
-	}
+    private GUIStyle m_guiStyle;
+
+    // Use this for initialization
+    void Start ()
+    {
+        m_guiStyle = new GUIStyle();
+        m_guiStyle.fontSize = 30;
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if(!is_finished)
+            timer -= 0.01f;
+        is_finished = (timer <= 0);
         if (is_finished && !is_called_once)
         {
             // calculating phase
@@ -33,10 +42,10 @@ public class GameRuler : MonoBehaviour {
             p3_points.x = p3_obj.GetComponent<MoveObject>().points;
             p4_points.x = p4_obj.GetComponent<MoveObject>().points;
 
-            p1_obj.GetComponent<MoveObject>().Freeze();
-            p2_obj.GetComponent<MoveObject>().Freeze();
-            p3_obj.GetComponent<MoveObject>().Freeze();
-            p4_obj.GetComponent<MoveObject>().Freeze();
+            p1_obj.GetComponent<MoveObject>().forcedlyFreeze();
+            p2_obj.GetComponent<MoveObject>().forcedlyFreeze();
+            p3_obj.GetComponent<MoveObject>().forcedlyFreeze();
+            p4_obj.GetComponent<MoveObject>().forcedlyFreeze();
 
             Debug.Log("Finished!");
             is_called_once = true;
@@ -49,5 +58,19 @@ public class GameRuler : MonoBehaviour {
         GUILayout.BeginHorizontal("box");
         GUILayout.Box("FPS:" + fps.ToString() + "  ( " + 1.0f / fps * 1000.0f + " ms)", GUILayout.Width(200));
         GUILayout.EndHorizontal();
+        if(timer > 0)
+        {
+            GUI.Label(new Rect(Screen.width / 2,
+                Screen.height / 2,
+                Screen.width / 2,
+                Screen.height / 2), "" + (int)(timer+1f), m_guiStyle);
+        }
+        else
+        {
+            GUI.Label(new Rect(Screen.width / 2,
+                Screen.height / 2,
+                Screen.width / 2,
+                Screen.height / 2), "Finish!!", m_guiStyle);
+        }
     }
 }

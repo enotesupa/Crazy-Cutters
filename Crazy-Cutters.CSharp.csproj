@@ -71,6 +71,7 @@
     <Compile Include="Assets\GamePadInput\GamePad.cs" />
     <Compile Include="Assets\GameRuler.cs" />
     <Compile Include="Assets\MoveObject.cs" />
+    <Compile Include="Assets\MoveRestrictor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
