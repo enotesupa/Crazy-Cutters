@@ -32,4 +32,8 @@ public class MoveRestrictor : MonoBehaviour {
             GetComponent<MoveObject>().Freeze();
         }
 	}
+
+	public void MoveAgain(){
+		is_restricted = false;
+	}
 }

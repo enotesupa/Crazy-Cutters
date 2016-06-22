@@ -3,6 +3,30 @@ using System.Collections;
 using GamepadInput;
 using System;
 
+public static class TrainRendererExtensions
+{
+	/// <summary>
+	/// Reset the trail so it can be moved without streaking
+	/// </summary>
+	public static void Reset(this TrailRenderer trail, MonoBehaviour instance)
+	{
+		instance.StartCoroutine(ResetTrail(trail));   
+	}
+	
+	/// <summary>
+	/// Coroutine to reset a trail renderer trail
+	/// </summary>
+	/// <param name="trail"></param>
+	/// <returns></returns>
+	static IEnumerator ResetTrail(TrailRenderer trail)
+	{
+		var trailTime = trail.time;
+		trail.time = 0;
+		yield return 0;
+		trail.time = trailTime;
+	}        
+}
+
 public class MoveObject : MonoBehaviour
 {
 
@@ -29,6 +53,9 @@ public class MoveObject : MonoBehaviour
 
     private bool is_finished = false;
     private bool is_finished2 = false;
+
+	public int csv_mode = 0;
+	private bool[,,] answers;
 
     public void Freeze()
     {
@@ -76,7 +103,57 @@ public class MoveObject : MonoBehaviour
             {
                 if (is_finished)
                 {
-                    is_finished2 = true;
+					is_finished2 = true;
+					if (csv_mode == 1) {// write mode
+						System.IO.StreamWriter sw = new System.IO.StreamWriter (
+							@"teacher.csv", false);
+						string teacher_data = "";
+						for (int i = 0; i < cols; i++) {
+							for (int j = 0; j < rows; j++) {
+								teacher_data += (vecmap [i, j].is_stepped) ? "1" : "0";
+								teacher_data += (j == rows - 1) ? "" : ",";
+							}
+							sw.WriteLine (teacher_data);
+							teacher_data = "";
+						}
+						sw.Close();
+						Debug.Log("finished writing");
+					} else if (csv_mode == 2) {// read mode
+						answers = new bool[5,cols, rows];
+						System.IO.StreamReader sr = new System.IO.StreamReader (@"teacher.csv");
+						int line_num = 0;
+						while(!sr.EndOfStream){
+							string line = sr.ReadLine();
+							string[] values = line.Split(',');
+							int value_num = 0;
+							foreach(string value in values){
+								answers[0,line_num,value_num] = (value == "1");
+								value_num++;
+							}
+							line_num++;
+						}
+						sr.Close();
+						Debug.Log("finished reading");
+						
+						float matched = 0f;
+						float unmatched = 0f;
+						for (int i = 0; i < cols; i++) {
+							for (int j = 0; j < rows; j++) {
+								if(answers [0,i, j] == vecmap [i, j].is_stepped){
+									matched += 1f;
+								}else{
+									unmatched += 1f;
+								}
+							}
+						}
+						Debug.Log("finished writing");
+						Debug.Log("result "+(100f*(matched-unmatched)/matched));
+					} else {// do nothing
+						Debug.Log("mode none");
+					}
+					GetComponent<TrailRenderer>().Reset(this);
+					is_finished2 = is_finished = false;
+					GetComponent<MoveRestrictor>().MoveAgain();
                 }
             }
             else
