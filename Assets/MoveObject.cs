@@ -41,11 +41,12 @@ public class MoveObject : MonoBehaviour
     public GameObject origin;
     private GameObject[,] objects;
 
-    public int cols = 40;
-    public int rows = 40;
-    public float expansion_rate = 2f;
+    private int cols = 40;
+    private int rows = 40;
+    private float expansion_rate = 2f;
 
-    public int points = 0;
+    public float points = 0;
+	//public int current_img = -1;
     public int player_num = 0;
 
     public GameObject picture;
@@ -55,7 +56,12 @@ public class MoveObject : MonoBehaviour
     private bool is_finished2 = false;
 
 	public int csv_mode = 0;
-	private bool[,,] answers;
+	
+	private GUIStyle m_guiStyle;
+	public GameObject gameruler;
+	private GameRuler gr;
+	private TrailRenderer tr;
+	private MoveRestrictor mr;
 
     public void Freeze()
     {
@@ -70,7 +76,14 @@ public class MoveObject : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
+	{
+		m_guiStyle = new GUIStyle();
+		m_guiStyle.fontSize = 40;
+		m_guiStyle.normal.textColor = new Color(255f/255f, 80f/255f, 0);
+
+		gr = gameruler.GetComponent<GameRuler> ();
+		tr = GetComponent<TrailRenderer>();
+		mr = GetComponent<MoveRestrictor>();
         cols = rows;
         vecmap = new vecbool[cols, rows];
         objects = new GameObject[cols, rows];
@@ -118,42 +131,30 @@ public class MoveObject : MonoBehaviour
 						}
 						sw.Close();
 						Debug.Log("finished writing");
-					} else if (csv_mode == 2) {// read mode
-						answers = new bool[5,cols, rows];
-						System.IO.StreamReader sr = new System.IO.StreamReader (@"teacher.csv");
-						int line_num = 0;
-						while(!sr.EndOfStream){
-							string line = sr.ReadLine();
-							string[] values = line.Split(',');
-							int value_num = 0;
-							foreach(string value in values){
-								answers[0,line_num,value_num] = (value == "1");
-								value_num++;
-							}
-							line_num++;
-						}
-						sr.Close();
-						Debug.Log("finished reading");
-						
+					} else if (csv_mode == 2) {// compare mode	
 						float matched = 0f;
 						float unmatched = 0f;
 						for (int i = 0; i < cols; i++) {
 							for (int j = 0; j < rows; j++) {
-								if(answers [0,i, j] == vecmap [i, j].is_stepped){
+								if(gr.getAnswer(0,i, j) == vecmap [i, j].is_stepped){
 									matched += 1f;
 								}else{
 									unmatched += 1f;
 								}
+								vecmap [i, j].is_stepped = false;
 							}
 						}
+						points += (100f*(matched-unmatched)/matched);
 						Debug.Log("finished writing");
-						Debug.Log("result "+(100f*(matched-unmatched)/matched));
+						Debug.Log("result "+points);
 					} else {// do nothing
 						Debug.Log("mode none");
 					}
-					GetComponent<TrailRenderer>().Reset(this);
+					//current_img = UnityEngine.Random.Range(0,19);
+					//copied_picture.GetComponent<SpriteRenderer>().sprite = gr.getImage(current_img);
+					tr.Reset(this);
 					is_finished2 = is_finished = false;
-					GetComponent<MoveRestrictor>().MoveAgain();
+					mr.MoveAgain();
                 }
             }
             else
@@ -161,7 +162,6 @@ public class MoveObject : MonoBehaviour
                 string[] strarg = other.name.Split(' ');
                 if (vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped == false)
                 {
-                    points++;
                     vecmap[int.Parse(strarg[0]), int.Parse(strarg[1])].is_stepped = true;
                 }
             }
@@ -274,47 +274,34 @@ public class MoveObject : MonoBehaviour
     }
     
     void OnGUI()
-    {
-        if (is_finished2)
-        {
-            switch(player_num)
-            {
-                case 1:
-                    GUI.Label(new Rect(Screen.width / 4,
-                        Screen.height / 4,
-                        Screen.width / 4,
-                        Screen.height / 4),
-                        "Finish!!");
-                    break;
-                case 2:
-                    GUI.Label(new Rect(3*Screen.width / 4,
-                        Screen.height / 4,
-                        Screen.width / 4,
-                        Screen.height / 4),
-                        "Finish!!");
-                    break;
-                case 3:
-                    GUI.Label(new Rect(Screen.width / 4,
-                        3 * Screen.height / 4,
-                        Screen.width / 4,
-                        Screen.height / 4),
-                        "Finish!!");
-                    break;
-                case 4:
-                    GUI.Label(new Rect(3 * Screen.width / 4,
-                        3 * Screen.height / 4,
-                        Screen.width / 4,
-                        Screen.height / 4),
-                        "Finish!!");
-                    break;
-                default:
-                    GUI.Label(new Rect(Screen.width / 4,
-                        Screen.height / 4,
-                        Screen.width / 4,
-                        Screen.height / 4),
-                        "Finish!!");
-                    break;
-            }
-        }
+	{
+		switch (player_num) {
+		case 1:
+			GUI.Label(new Rect(Screen.width / 2.35f,
+			                   Screen.height / 2.6f,
+			                   Screen.width / 2,
+			                   Screen.height / 2), ""+(int)points, m_guiStyle);
+			break;
+		case 2:
+			GUI.Label(new Rect(Screen.width / 1.875f,
+			                   Screen.height / 2.6f,
+			                   Screen.width / 2,
+			                   Screen.height / 2), ""+(int)points, m_guiStyle);
+			break;
+		case 3:
+			GUI.Label(new Rect(Screen.width / 2.35f,
+			                   Screen.height / 1.85f,
+			                   Screen.width / 2,
+			                   Screen.height / 2), ""+(int)points, m_guiStyle);
+			break;
+		case 4:
+			GUI.Label(new Rect(Screen.width / 1.875f,
+			                   Screen.height / 1.85f,
+			                   Screen.width / 2,
+			                   Screen.height / 2), ""+(int)points, m_guiStyle);
+			break;
+		default:
+			break;
+		}
     }
 }
